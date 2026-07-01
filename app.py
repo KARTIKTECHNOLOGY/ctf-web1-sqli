@@ -2,7 +2,7 @@ from flask import Flask, request, render_template_string, session, redirect
 import sqlite3, os
 
 app = Flask(__name__)
-app.secret_key = os.urandom(16)
+app.secret_key = os.environ.get("SECRET_KEY", "cybertec8_fixed_dev_secret_key_2026")
 DB = "/tmp/web1_users.db"
 FLAG = "Flag_CT8{sq1_1nj3ct10n_byp@ss_l0g1n_2026}"
 
@@ -16,6 +16,10 @@ def init_db():
     c.execute("INSERT INTO users VALUES (3,'alice','al1c3p@ss','user')")
     conn.commit()
     conn.close()
+
+# IMPORTANT: init_db() called at module level (not inside __main__)
+# so it runs even when deployed via gunicorn/uwsgi on platforms like Render.
+init_db()
 
 LOGIN = """
 <!doctype html>
@@ -129,5 +133,4 @@ def logout():
     return redirect("/")
 
 if __name__ == "__main__":
-    init_db()
     app.run(host="0.0.0.0", port=7001, debug=False)
